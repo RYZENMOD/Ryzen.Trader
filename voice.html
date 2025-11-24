@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAJ MODS ULTRA AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-dark: #09090b;
+    --card-bg: rgba(30, 30, 40, 0.7);
+    --primary: #6366f1;
+    --accent: #8b5cf6;
+    --success: #10b981;
+    --danger: #ef4444;
+    --gold: #fbbf24;
+    --text: #f3f4f6;
+    --glass: rgba(255, 255, 255, 0.05);
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+* { box-sizing: border-box; user-select: none; }
+
+body {
+    margin: 0;
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 20%);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+h1 {
+    margin: 10px 0 15px;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* CARDS */
+.card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* STATS GRID */
+#stats-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    text-align: center;
+}
+.stat-item {
+    background: var(--glass);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.stat-item.full { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;}
+.stat-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-val { font-size: 18px; font-weight: 700; margin-top: 2px; }
+
+/* CONTROLS */
+#bot-control, #mode-control {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 15px;
+}
+button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+button:active { transform: scale(0.96); }
+#startButton { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+#stopButton { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+#stopButton:disabled { opacity: 0.5; filter: grayscale(1); }
+.btn-mode { background: var(--glass); border: 1px solid var(--border); color: #ccc; }
+.btn-mode.active { background: var(--primary); color: white; border-color: var(--primary); }
+.btn-wallet { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: black; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+
+/* INPUTS */
+input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+    margin: 5px 0 10px;
+    outline: none;
+    font-family: inherit;
+}
+input:focus { border-color: var(--primary); }
+
+/* PREDICTION BOX (REDESIGNED) */
+#prediction-box {
+    text-align: center;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+#prediction-box::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.pred-title { font-size: 11px; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; }
+#prediction {
+    font-size: 52px;
+    font-weight: 900;
+    margin: 5px 0;
+    text-shadow: 0 0 30px rgba(255,255,255,0.1);
+    display: block;
+    line-height: 1;
+}
+.BIG { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important; }
+.SMALL { color: var(--danger); text-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important; }
+
+/* BET SUGGESTION */
+.bet-box {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 10px 20px;
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 700;
+    display: flex; justify-content: center; gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 10px;
+}
+#patternName { color: var(--text); font-weight: 600; }
+
+/* TIMER */
+#timer-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));
+}
+#liveTime { font-family: monospace; font-size: 24px; font-weight: 700; color: var(--accent); }
+
+/* TABS & TABLE */
+.tabs { display: flex; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 12px; margin-bottom: 10px; width: 100%; max-width: 400px; }
+.tabs button { background: transparent; box-shadow: none; padding: 10px; color: #888; border-radius: 8px; }
+.tabs button.active { background: var(--card-bg); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+#history-wrap {
+    width: 100%; max-width: 400px; height: 280px; overflow-y: auto;
+    border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+}
+table { width: 100%; border-collapse: collapse; }
+th { position: sticky; top: 0; background: #1a1a20; padding: 10px 8px; font-size: 11px; color: #aaa; }
+td { padding: 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+
+/* Status Badges */
+.status { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+.status.win { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+.status.loss { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+.status.pending { background: rgba(255, 200, 0, 0.2); color: #fbbf24; }
+
+/* Settings Toggle */
+.switch-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #aaa; cursor: pointer; }
+.fa-volume-high { color: var(--success); }
+.fa-volume-xmark { color: var(--danger); }
+</style>
+</head>
+<body>
+
+<h1>RAJ MODS <span style="color:var(--gold)">ULTRA</span> AI</h1>
+
+<div id="stats-box" class="card">
+    <div class="stat-item">
+        <div class="stat-label">Total Preds</div>
+        <div class="stat-val" id="totalPreds">0</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-val" id="accuracy">0%</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-label">Wins</div>
+        <div class="stat-val" id="totalWins" style="color:var(--success)">0</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-label">Losses</div>
+        <div class="stat-val" id="totalLosses" style="color:var(--danger)">0</div>
+    </div>
+    <div class="stat-item full">
+        <div class="switch-wrap" onclick="toggleSound()">
+            <i id="soundIcon" class="fa-solid fa-volume-high"></i> <span id="soundText">Sound ON</span>
+        </div>
+        <div style="font-size:12px; color:#888;">
+            <i class="fa-solid fa-circle" id="serverDot" style="color:red; font-size:8px; margin-right:4px;"></i> 
+            <span id="statusText">Stopped</span>
+        </div>
+    </div>
+</div>
+
+<div id="mode-control">
+    <button class="btn-mode" onclick="setMode(30)">⚡ 30 Sec</button>
+    <button class="btn-mode active" onclick="setMode(60)">⏱ 1 Min</button>
+</div>
+
+<div style="width:100%; max-width:400px; margin-bottom:10px;">
+    <button class="btn-wallet" onclick="toggleWalletInput()"><i class="fa-solid fa-wallet"></i> Wallet Balance</button>
+</div>
+
+<div id="wallet-setup" class="card" style="display:none; border-color:var(--gold);">
+    <h3 style="margin-top:0; font-size:14px; color:var(--gold);">💰 Fund Management (6 Level)</h3>
+    <p style="font-size:11px; color:#aaa; margin-bottom:8px;">Enter your total game balance below. The AI will automatically calculate a 6-step strategy.</p>
+    <input id="walletInput" type="number" placeholder="Enter Amount (e.g. 100, 500, 1000)" />
+    <div id="plan-display" style="font-size:11px; color:#fff; background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; display:none;">
+        Plan: <span id="plan-string" style="color:var(--success); font-weight:700;">--</span>
+    </div>
+</div>
+<div id="bot-control">
+    <button id="startButton"><i class="fa-solid fa-play"></i> START BOT</button>
+    <button id="stopButton" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+</div>
+
+<div id="timer-box" class="card" style="padding: 15px 25px;">
+    <div style="font-size:12px; color:#aaa;">Period <span id="period" style="color:#fff; font-weight:700; margin-left:5px">--</span></div>
+    <div id="liveTime">00:00</div>
+</div>
+
+<div id="prediction-box" class="card">
+    <div class="pred-title">AI PREDICTION</div>
+    <span id="prediction" class="BIG">WAITING</span>
+    
+    <div class="bet-box">
+        <span><i class="fa-solid fa-coins"></i> Bet:</span>
+        <span id="betAmount">₹10</span>
+    </div>
+
+    <div class="info-row">
+        <div><i class="fa-solid fa-chart-line"></i> <span id="patternName">Analyzing...</span></div>
+        <div>Conf: <span id="confidence">0</span>%</div>
+    </div>
+</div>
+
+<div id="telegram-setup" class="card" style="display:none;"> 
+    <h3 style="margin-top:0; font-size:14px;"><i class="fa-brands fa-telegram"></i> Telegram Config</h3>
+    <input id="botToken" placeholder="Bot Token" />
+    <input id="channelId" placeholder="Chat ID" />
+    <button id="testBtn" style="background:var(--primary); margin-top:5px;">Test Connection</button>
+</div>
+<div style="text-align:center; margin-bottom:10px;">
+    <button onclick="document.getElementById('telegram-setup').style.display = document.getElementById('telegram-setup').style.display==='none'?'block':'none'" style="background:transparent; border:1px solid #333; padding:6px 12px; font-size:11px; width:auto; display:inline-block;">⚙️ Telegram Setup</button>
+</div>
+
+<div class="tabs">
+    <button id="predTab" class="active">History</button>
+    <button id="gameTab">Game Data</button>
+</div>
+
+<div id="history-wrap">
+    <table>
+        <thead id="tableHead"><tr><th>Period</th><th>Pred</th><th>Res</th><th>Sts</th></tr></thead>
+        <tbody id="tableBody"><tr><td colspan="4" style="padding:20px; opacity:0.5;">Waiting for data...</td></tr></tbody>
+    </table>
+</div>
+
+<script>
+/* =========================
+   CONFIG & SOUNDS
+========================= */
+const API_CURRENT = "https://api.bdg88zf.com/api/webapi/GetGameIssue";
+const HISTORY_URL_30 = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+const HISTORY_URL_60 = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
+const CFG_60 = { typeId:1 };
+const CFG_30 = { typeId:3 };
+
+// SOUND URLS (Short beeps)
+const SND_WIN = new Audio("https://cdn.pixabay.com/audio/2021/08/04/audio_12b0c7443c.mp3"); // Ding
+const SND_LOSS = new Audio("https://cdn.pixabay.com/audio/2021/08/09/audio_88447e769f.mp3"); // Buzz
+const SND_START = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_7368037388.mp3"); // Notification
+
+// Telegram Images
+const IMG_START="https://raw.githubusercontent.com/RYZENMOD/Prediction-banner/d84b2806692cd45a30b0e65c96910a1b35370ea1/Start%20session%20banner.png";
+const IMG_PRED="https://raw.githubusercontent.com/RYZENMOD/Prediction-banner/d84b2806692cd45a30b0e65c96910a1b35370ea1/Prediction%20banner.png";
+const IMG_STOP="https://raw.githubusercontent.com/RYZENMOD/Prediction-banner/d84b2806692cd45a30b0e65c96910a1b35370ea1/Stop%20session%20banner.png";
+
+// STICKERS
+const STICK_FIXED = "CAACAgUAAxkBAAEDEC9pCVVRUpjzq5JD0XXds7EfRQje15wACuxMAAtZgYVZaFxCncOnSvh4E"; 
+const STICKER_POOL_RANDOM = [
+  "CAACAgQAAxkBAAEDEGlpC0W3zuFpqApvI9QFy1ueCMPHIgACcxIAAjupeFAWe8eIo-19-B4E",
+  "CAACAgUAAxkBAAEPuN5pDbcEyco-gtAUPuymnGbvOcBqGwACBQYAAk1aOVXI47-HBpfiKzYE",
+  "CAACAgUAAxkBAAEPuOBpDbcPRoP0JFmzV-htZ6NensDGqQAC_AYAArAoOVVxrvjZwQvydjYE",
+  "CAACAgUAAxkBAAEPuOJpDbccmUSeIzzpT2jlxr_7F4A39AACvAUAAgZ2OFWfxfHVhXVCRjYE",
+  "CAACAgUAAxkBAAEPuORpDbeH9L3OL4w3rwyIW10GVKwvogACKRQAApN3OFTCh4tS6Q2ZczYE",
+  "CAACAgUAAxkBAAEPuOZpDbeWjmEJKUG3bvPM22VAL-41uQACPhIAAi970VUswOXvMWHwiDYE",
+  "CAACAgUAAxkBAAEPuOhpDbfZqZw0SgFxzzFb3hGtFvaRswACOREAAkVT2VUaN-wmLuBpYDYE",
+  "CAACAgUAAxkBAAEPuOppDbfpT4KKVP5jn5Pi86YoHD3ELQACdBcAAgZn0VUVGiPuE4aJujYE",
+  "CAACAgUAAxkBAAEPuOxpDbgQpF5psXHINn_zTZwW1By1CgAC5BUAAgw9uFYOlHPZ7wcsbzYE"
+];
+
+/* STATE */
+let intervalSec = 60;
+let historyURL  = HISTORY_URL_60; 
+let running = false;
+let loopId = null;
+let soundOn = true;
+let lastPeriod = null;
+let lastPrediction = "BIG";
+let nextSendAllowedAt = 0;
+let isSendingStickers = false;
+
+// MONEY MANAGEMENT STATE
+let baseBet = 10;
+let currentBet = 10;
+let betLevels = [10, 30, 90, 270, 810, 2430]; // Default Plan
+let currentLevelIndex = 0;
+
+const stats = { wins:0, losses:0, get accuracy(){ const t=this.wins+this.losses; return t? (this.wins/t*100).toFixed(0) : "0"; } };
+const predictionHistory = [];
+let latestGameHistory = [];
+
+/* UI HELPERS */
+const qs = (s)=>document.querySelector(s);
+const pad2 = n => String(n).padStart(2,"0");
+const bigSmall = n => n>=5 ? "BIG" : "SMALL";
+const colorOf  = n => [1,3,7,9].includes(n)?"Green":[2,4,6,8].includes(n)?"Red":"Violet";
+const nowSec   = ()=>Date.now();
+
+function toggleWalletInput() {
+    const el = qs("#wallet-setup");
+    el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function calculate6LevelPlan(balance) {
+    let base = Math.floor(balance / 70);
+    if(base < 1) base = 1; 
+    
+    // Create Levels: 1x, 2x, 4x, 8x, 16x, 32x
+    betLevels = [
+        base * 1,
+        base * 2,
+        base * 4,
+        base * 8,
+        base * 16,
+        base * 32
+    ];
+    
+    qs("#plan-string").textContent = betLevels.join(" - ");
+    qs("#plan-display").style.display = "block";
+    currentBet = betLevels[0];
+    currentLevelIndex = 0;
+    qs("#betAmount").textContent = "₹" + currentBet;
+}
+
+// SPEAK HELPER (New)
+function speakVoice(text) {
+    if(!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'hi-IN'; // Attempt Hindi voice
+    u.rate = 1.0;
+    window.speechSynthesis.speak(u);
+}
+
+function setButtons(){
+  qs("#startButton").disabled = running;
+  qs("#stopButton").disabled  = !running;
+  qs("#serverDot").style.color = running ? "var(--success)" : "red";
+  qs("#statusText").textContent = running ? "Active" : "Stopped";
+  if(running && soundOn) SND_START.play().catch(()=>{});
+}
+
+function setMode(sec){
+  intervalSec = sec;
+  historyURL  = (sec===30 ? HISTORY_URL_30 : HISTORY_URL_60);
+  document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+  if(sec===30) qs(".btn-mode:first-child").classList.add("active");
+  else qs(".btn-mode:last-child").classList.add("active");
+  
+  // Reset
+  lastPeriod = null;
+  predictionHistory.length = 0;
+  qs("#period").textContent = "Wait...";
+  
+  // Reset Bet Levels to default or recalculate if wallet is set
+  const w = qs("#walletInput").value;
+  if(w && parseInt(w) > 0) calculate6LevelPlan(parseInt(w));
+  else { currentBet = 10; currentLevelIndex = 0; }
+  
+  renderTable();
+  updateStatsBox();
+}
+
+function toggleSound(){
+  soundOn = !soundOn;
+  const ico = qs("#soundIcon");
+  if(soundOn){ ico.className="fa-solid fa-volume-high"; qs("#soundText").textContent="Sound ON"; }
+  else { ico.className="fa-solid fa-volume-xmark"; qs("#soundText").textContent="Muted"; }
+}
+
+function updateStatsBox(){
+  qs("#totalPreds").textContent  = predictionHistory.length;
+  qs("#totalWins").textContent   = stats.wins;
+  qs("#totalLosses").textContent = stats.losses;
+  qs("#accuracy").textContent    = stats.accuracy + "%";
+}
+function updateTimer(){
+  const d=new Date();
+  d.setTime(d.getTime()+60000*(d.getTimezoneOffset()+330)); 
+  const secs=d.getMinutes()*60 + d.getSeconds();
+  const left = intervalSec - (secs % intervalSec);
+  qs("#liveTime").textContent = `00:${pad2(left)}`;
+  return left;
+}
+
+/* TELEGRAM */
+function tgCreds(){ return (qs("#botToken").value && qs("#channelId").value) ? {token:qs("#botToken").value, chat:qs("#channelId").value} : null; }
+async function tgSendPhoto(photo,caption){
+  const c=tgCreds(); if(!c) return null;
+  try{ const r=await fetch(`https://api.telegram.org/bot${c.token}/sendPhoto`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:c.chat,photo,caption,parse_mode:"Markdown"})}); const j=await r.json(); return j.ok?j.result.message_id:null;}catch{return null;}
+}
+async function tgSendMessage(text){
+  const c=tgCreds(); if(!c) return null;
+  try{await fetch(`https://api.telegram.org/bot${c.token}/sendMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:c.chat,text,parse_mode:"Markdown"})}); return true;}catch{return false;}
+}
+async function tgDelete(mid){
+  const c=tgCreds(); if(!c||!mid) return;
+  try{await fetch(`https://api.telegram.org/bot${c.token}/deleteMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:c.chat,message_id:mid})});}catch{}
+}
+async function tgSendStickers(){
+  if(isSendingStickers)return; isSendingStickers=true;
+  const c=tgCreds(); if(!c){isSendingStickers=false;return;}
+  const send=async(s)=>{try{await fetch(`https://api.telegram.org/bot${c.token}/sendSticker`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:c.chat,sticker:s})});}catch{}};
+  const p=[...STICKER_POOL_RANDOM].sort(()=>0.5-Math.random());
+  await send(STICK_FIXED); await new Promise(r=>setTimeout(r,1000));
+  await send(p[0]); await new Promise(r=>setTimeout(r,1000));
+  await send(p[1]); await new Promise(r=>setTimeout(r,1000));
+  await send(p[2]);
+  nextSendAllowedAt=nowSec()+15000; isSendingStickers=false;
+}
+async function sendStartStop(w){ await tgSendPhoto(w==="start"?IMG_START:IMG_STOP, w==="start"?"RAJ MODS – System Active":"RAJ MODS – System Stopped"); }
+
+/* AI LOGIC & PATTERNS */
+function aiPick(hist){
+  if(hist.length<5) return {pick:Math.random()>.5?"BIG":"SMALL", conf:60, pattern:"Random Scan"};
+  
+  const last = hist[0].resultType;
+  const last2 = hist[1].resultType;
+  const last3 = hist[2].resultType;
+
+  // Pattern Recognition
+  if(last===last2 && last2===last3) return {pick:last==="BIG"?"SMALL":"BIG", conf:98, pattern:"Dragon Cut"}; // 3 same -> Cut
+  if(last!==last2 && last2!==last3) return {pick:last, conf:95, pattern:"ZigZag Follow"}; // ABAB -> Follow
+  if(last===last2) return {pick:last==="BIG"?"SMALL":"BIG", conf:85, pattern:"Double Cut"}; // AA -> Cut
+  
+  return {pick:last==="BIG"?"SMALL":"BIG", conf:75, pattern:"Trend Reversal"};
+}
+
+/* FETCH & LOOP */
+async function fetchCurrentPeriodAndHistory(){
+  let h=[]; 
+  try{ const r=await fetch(historyURL+"?ts="+Date.now()); const j=await r.json(); if(j?.data?.list) h=j.data.list.map(x=>({period:x.issueNumber, number:parseInt(x.number), resultType:bigSmall(parseInt(x.number)), color:colorOf(parseInt(x.number))})); latestGameHistory=h;}catch{}
+  
+  let p="Unavailable";
+  try{ const r=await fetch(API_CURRENT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({language:0,random:"e7",signature:"1F",timestamp:Math.floor(Date.now()/1000),typeId:(intervalSec===30?CFG_30:CFG_60).typeId})}); const j=await r.json(); if(j?.data?.issueNumber) p=j.data.issueNumber; }catch{}
+  
+  if((!p||p==="Unavailable")&&h.length>0) p=(BigInt(h[0].period)+1n).toString();
+  qs("#period").textContent = p!=="Unavailable"?p:"Load...";
+  return {period:p, hist:h};
+}
+
+async function tick(){
+  const left = updateTimer();
+  if(!running) return;
+  if (isSendingStickers || nowSec() < nextSendAllowedAt) return;
+  if(left>5 && left<intervalSec-5 && lastPeriod!==null) return;
+
+  const {period, hist} = await fetchCurrentPeriodAndHistory();
+  if(period==="Unavailable" || period===lastPeriod) return;
+  lastPeriod = period;
+
+  // SETTLE PREVIOUS & MANAGE BET
+  if(predictionHistory.length>0){
+    const last = predictionHistory[0];
+    if(last.resultStatus==="Pending"){
+      const match = hist.find(x=>x.period===last.period);
+      if(match){
+        const actual = bigSmall(match.number);
+        const isWin = (actual===lastPrediction);
+        last.resultType = actual;
+        last.resultStatus = isWin ? "WIN" : "LOSS";
+        
+        if(isWin) {
+          stats.wins++;
+          // WIN: Back to Level 1
+          currentLevelIndex = 0;
+          currentBet = betLevels[0];
+          
+          if(soundOn) SND_WIN.play().catch(()=>{});
+          await tgSendStickers();
+        } else {
+          stats.losses++;
+          // LOSS: Next Level
+          currentLevelIndex++;
+          if(currentLevelIndex >= betLevels.length) currentLevelIndex = 0; 
+          currentBet = betLevels[currentLevelIndex];
+          
+          // PLAY LOSS SOUND + VOICE
+          if(soundOn) {
+            SND_LOSS.play().catch(()=>{});
+            setTimeout(() => speakVoice("Mahadev next level pe win karva denge"), 800);
+          }
+          
+          if(last.telegramMessageId) await tgDelete(last.telegramMessageId);
+        }
+        updateStatsBox();
+      }
+    }
+  }
+
+  // PREDICT NEW
+  const {pick,conf,pattern} = aiPick(hist);
+  lastPrediction = pick;
+  
+  // UI Updates
+  const pBox = qs("#prediction");
+  pBox.style.opacity = 0;
+  setTimeout(()=>{ pBox.textContent = pick; pBox.className = pick; pBox.style.opacity = 1; }, 200);
+  
+  qs("#confidence").textContent = conf;
+  qs("#patternName").textContent = pattern;
+  qs("#betAmount").textContent = "₹" + currentBet; // Update Bet UI
+
+  const entry = { period, prediction: pick, confidence: conf, logic:pattern, resultType:"-", resultStatus:"Pending", telegramMessageId:null };
+  predictionHistory.unshift(entry);
+  updateStatsBox();
+
+  // TELEGRAM SEND
+  const waitMs = Math.max(0, nextSendAllowedAt - nowSec());
+  if(waitMs>0) await new Promise(r=>setTimeout(r, waitMs));
+
+  const date = new Date().toLocaleDateString("en-GB").replace(/\//g,"-");
+  const txt = `✧  ＲＡＪ ＭＯＤＳ ＡＩ ✧\n\n╔═◈═◈═◈═◈═◈═╗\n•Date : ${date}\n•Wingo : ${intervalSec===60?"1Min":"30Sec"}\n•Period : ${period}\n╚═◈═◈═◈═◈═◈═╝\n\n📢 PREDICTION: ${pick} 💰\n📊 Conf: ${conf}%\n🧠 Pattern: ${pattern}\n💡 Suggestion: ₹${currentBet}\n\n────────✦✧✦────────`;
+  
+  const id = await tgSendPhoto(IMG_PRED, txt);
+  if(id) entry.telegramMessageId = id;
+  
+  renderTable();
+}
+
+function renderTable(){
+  const h = qs("#tableHead"); const b = qs("#tableBody");
+  if(qs("#predTab").classList.contains("active")){
+    h.innerHTML = "<tr><th>Period</th><th>Pred</th><th>Res</th><th>Sts</th></tr>";
+    b.innerHTML = predictionHistory.map(p=>`<tr style="background:${p.resultStatus==='WIN'?'rgba(16,185,129,0.1)':''}"><td>${String(p.period).slice(-4)}</td><td class="${p.prediction}" style="font-weight:900">${p.prediction}</td><td>${p.resultType}</td><td><span class="status ${p.resultStatus.toLowerCase()}">${p.resultStatus}</span></td></tr>`).join("");
+  }else{
+    h.innerHTML = "<tr><th>Period</th><th>Num</th><th>Size</th><th>Col</th></tr>";
+    b.innerHTML = latestGameHistory.map(g=>`<tr><td>${String(g.period).slice(-4)}</td><td>${g.number}</td><td>${g.resultType}</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${g.color==='Green'?'#10b981':g.color==='Red'?'#ef4444':'#8b5cf6'}"></span></td></tr>`).join("");
+  }
+}
+
+/* INIT */
+qs("#startButton").onclick=async()=>{
+    if(running)return;
+    
+    // Check for Wallet Input before start
+    const wInput = qs("#walletInput").value;
+    if(wInput && parseInt(wInput) > 0) {
+        calculate6LevelPlan(parseInt(wInput));
+    }
+    
+    if(!tgCreds()){alert("Check Telegram!");return;}
+    running=true;setButtons();updateStatsBox();await sendStartStop("start");if(!loopId)loopId=setInterval(tick,1000);
+};
+
+qs("#stopButton").onclick=async()=>{if(!running)return;running=false;setButtons();updateStatsBox();await sendStartStop("stop");};
+qs("#testBtn").onclick=async()=>{alert((await tgSendMessage("✅ Connected"))?"Sent!":"Failed.");};
+qs("#predTab").onclick=()=>{qs("#predTab").classList.add("active");qs("#gameTab").classList.remove("active");renderTable();};
+qs("#gameTab").onclick=()=>{qs("#gameTab").classList.add("active");qs("#predTab").classList.remove("active");renderTable();};
+
+setMode(60); setButtons(); updateStatsBox(); renderTable(); setInterval(updateTimer,1000);
+</script>
+</body>
+</html>
